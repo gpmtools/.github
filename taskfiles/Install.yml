@@ -7,7 +7,7 @@ vars:
   CARGO_PKGS: csvlens ripgrep
 
 tasks:
-  install:
+  default:
     desc: Install org dependencies
     cmds:
       - for: { var: GH_EXTENSIONS }

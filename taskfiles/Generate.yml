@@ -3,7 +3,7 @@ version: "3"
 silent: true
 
 tasks:
-  generate:
+  default:
     desc: Generate the gh-pm binary
     cmds:
       - defer: rm -rf types

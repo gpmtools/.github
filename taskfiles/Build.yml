@@ -3,7 +3,7 @@ version: "3"
 silent: true
 
 tasks:
-  build:
+  default:
     desc: Build the executable based on the project
     cmds:
       - task: go-build
