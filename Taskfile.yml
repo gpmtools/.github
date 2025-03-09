@@ -17,7 +17,6 @@ tasks:
   default:
     ignore_error: true
     cmds:
-      - task: stat
       - task -l
 
   stat:
