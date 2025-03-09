@@ -11,6 +11,13 @@ vars:
     sh: git rev-parse --show-toplevel
 
 tasks:
+  default:
+    cmds:
+      - task: log:i-"Welcome to gpmtools"
+      - task: log:i-"A collection of tools designed to keep project creation and shipping in the command line."
+      - task --list-all
+    silent: true
+
   build:
     desc: Build the gh-pm binary
     aliases: [b]
