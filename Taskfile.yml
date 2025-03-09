@@ -16,7 +16,9 @@ includes:
 tasks:
   default:
     ignore_error: true
-    cmd: task -l --json | jq -r '.tasks[].name' | fzf --header="Select a task to run" | xargs task
+    cmds:
+      - task: stat
+      - task -l
 
   stat:
     desc: Display information about the project
