@@ -1,10 +1,6 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 silent: true
-vars:
-  GIT_ROOT:
-    sh: git rev-parse --show-toplevel
-
 tasks:
   lint:
     cmd: task -l --json | jq -r '.tasks[].name' | fzf | xargs task
