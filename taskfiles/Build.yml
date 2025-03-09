@@ -10,6 +10,7 @@ tasks:
       - task: gh-extension-install
 
   go-build:
+    dir: "{{.USER_WORKING_DIR}}"
     preconditions:
       - sh: test -f go.mod
         msg: go.mod not found
@@ -28,6 +29,7 @@ tasks:
       - rg 'package main' -l -d 1 | grep -c "^main.go$"
 
   gh-extension-install:
+    dir: "{{.USER_WORKING_DIR}}"
     ignore_error: true
     preconditions:
       - sh: test -f {{.PACKAGE}}
