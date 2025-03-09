@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+silent: true
+vars:
+  GIT_ROOT:
+    sh: git rev-parse --show-toplevel
+
+tasks:
+  test:
+    desc: Run the tests
+    ignore_error: true
+    cmds:
+      - go test -v ./...
+    preconditions:
+      - sh: test -f go.mod
+        msg: go.mod not found
+      - sh: command -v go
+        msg: go not installed

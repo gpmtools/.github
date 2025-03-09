@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+silent: true
+vars:
+  GIT_ROOT:
+    sh: git rev-parse --show-toplevel
+
+tasks:
+  generate:
+    desc: Generate the gh-pm binary
+    cmds:
+      - defer: rm -rf types
+      - task: mock:fetch-data
+      - task: mock:jsonpkl-cards.json
+      - task: mock:jsonpkl-issues.json
+      - task: mock:jsonpkl-milestones.json
+      - task: mock:jsonpkl-prs.json
+      - task: mock:jsonpkl-projects.json
+      - task: mock:jsonpkl-releases.json
+      - task: mock:jsonpkl-user.json

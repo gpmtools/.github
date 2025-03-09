@@ -1,0 +1,36 @@
+co: '!id="$(gh pr list -L100 | fzf | cut -f1)"; [ -n "$id" ] && gh pr checkout "$id"'
+list-issues: '!gh issue list --json number,title,updatedAt --template "{{range .}}{{tablerow (printf \"#%v\" .number | autocolor \"green\") .title (timeago .updatedAt)}}{{end}}" | fzf --ansi | sed -E "s/^#([0-9]+).*/\1/"'
+
+start-issue: '!ISSUE=$(gh ils) && BRANCH=$(gh generate-issue-title $ISSUE) && gum confirm "Create & checkout branch: $(tput bold)$BRANCH$(tput sgr0)?" && gh issue edit $ISSUE --add-label state:in-progress && gh issue develop $ISSUE --name $BRANCH --checkout'
+
+issues-blocking-count: '!gh issue list --json labels --jq "[.[] | select(.labels[].name == \"blocking\")] | length"'
+issues-blocked-count: '!gh issue list --json labels --jq "[.[] | select(.labels[].name == \"blocked\")] | length"'
+# Get next milestone number
+next-milestone: '!gh milestone list --json number --jq ".[0].number"'
+
+# Get next milestone title/tag
+next-milestone-tag: '!gh milestone list --json title --jq ".[0].title"'
+
+# Get total count of open issues in next milestone
+milestone-total-count: '!gh issue list --milestone $(gh next-milestone) --state open --json number --jq "length"'
+
+# Get count of closed issues in next milestone
+milestone-completed-count: '!gh issue list --milestone $(gh next-milestone) --state closed --json number --jq "length"'
+
+# Get target date of next milestone
+milestone-target-date: '!gh milestone list --json dueOn,number --jq ".[0].dueOn"'
+
+# Get repos in an org
+#
+org-repos: '!ORG=$(gh org ls | fzf --header="Select Org to view repos"); gh repo ls $ORG --json nameWithOwner,url -t ''{{range .}}{{hyperlink .url .nameWithOwner}}{{"\n"}}{{end}}'' | gum format'
+
+# Get formatted due date (YEAR.WEEK.DAY) - macOS compatible
+milestone-due-date: '!target=$(gh milestone-target-date); date -j -f "%Y-%m-%dT%H:%M:%SZ" "$target" "+%Y.%V.%u"'
+
+# Calculate time remaining in weeks and days - macOS compatible
+milestone-days-remaining: '!target=$(gh milestone-target-date); now=$(date -j "+%s"); target_ts=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$target" "+%s"); seconds_diff=$((target_ts - now)); total_days=$((seconds_diff/86400)); weeks=$((total_days/7)); remaining_days=$((total_days%7)); hours=$(((seconds_diff%86400)/3600)); echo "${weeks}w ${remaining_days}d ${hours}h remaining"'
+
+recent-issues: "!gh issue list --json title,number --template '{{range .}} - [{{.number}}] {{.title}}{{end}}' -L 5"
+
+# View next milestone details
+view-milestone: '!gh milestone list --json number --jq ".[0].number" | xargs gh milestone view'

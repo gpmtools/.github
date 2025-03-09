@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+silent: true
+
+tasks:
+  build:
+    desc: Build the executable based on the project
+    cmds:
+      - task: go-build
+      - task: gh-extension-install
+
+  go-build:
+    preconditions:
+      - sh: test -f go.mod
+        msg: go.mod not found
+      - sh: test -f go.sum
+        msg: go.sum not found
+      - sh: command -v go
+        msg: go not installed
+    sources:
+      - go.mod
+      - go.sum
+      - main.go
+    cmds:
+      - go build .
+      - gum log -l info "Build completed."
+    status:
+      - rg 'package main' -l -d 1 | grep -c "^main.go$"
+
+  gh-extension-install:
+    ignore_error: true
+    preconditions:
+      - sh: test -f {{.PACKAGE}}
+        msg: Package not found
+      - sh: command -v gh
+        msg: gh not installed
+      - sh: test -f go.mod
+        msg: go.mod not found
+    vars:
+      MODULE:
+        sh: cat go.mod | head -n 1 | awk '{print $2}'
+      PACKAGE:
+        sh: basename {{.MODULE}}
+    sources:
+      - "{{ .PACKAGE }}"
+    cmds:
+      - gh extension remove {{.PACKAGE}}
+      - gh extension install . --force
+      - gum log -l info "Extension installed."
+    status:
+      - rg 'gh-' -l -d 1 | grep -c "^go.mod$"

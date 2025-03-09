@@ -1,52 +1,86 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
-
+silent: true
 includes:
-  log: taskfiles/Log.yml
-  mock: taskfiles/Mock.yml
-  pkgs: taskfiles/Pkgs.yml
-
-vars:
-  ROOT_DIR:
-    sh: git rev-parse --show-toplevel
+  build: { taskfile: taskfiles/Build.yml, flatten: true }
+  generate: { taskfile: taskfiles/Generate.yml, flatten: true }
+  install: { taskfile: taskfiles/Install.yml, flatten: true }
+  lint: { taskfile: taskfiles/Lint.yml, flatten: true }
+  release: { taskfile: taskfiles/Release.yml, flatten: true }
+  test: { taskfile: taskfiles/Test.yml, flatten: true }
 
 tasks:
   default:
-    cmds:
-      - task: log:i-"Welcome to gpmtools"
-      - task: log:i-"A collection of tools designed to keep project creation and shipping in the command line."
-      - task --list-all
-    silent: true
+    ignore_error: true
+    cmd: task -l --json | jq -r '.tasks[].name' | fzf --header="Select a task to run" | xargs task
 
-  build:
-    desc: Build the gh-pm binary
-    aliases: [b]
+  stat:
+    desc: Display information about the project
+    ignore_error: true
+    vars:
+      PROJECT_LANGUAGE:
+        sh: task _repo_languages
+      PROJECT_VERSION:
+        sh: task _repo_latest_release
+      PROJECT_NAME:
+        sh: task _project_name
+      PROJECT_DESCRIPTION:
+        sh: task _repo_description
+      REPO_CREATED_AT:
+        sh: task _repo_created_at
+      PROJECT_ISSUES:
+        sh: task _repo_issues
     cmds:
-      - go build -o gh-pm main.go
-      - task: log:i-"Build completed"
-      - gh extension remove gh-pm
-      - task: log:w-"Removing previous version"
-      - gh extension install . --force
-      - task: log:i-"Install completed"
-    silent: true
+      - gum format "# {{.PROJECT_NAME}}" "{{.PROJECT_DESCRIPTION}}"
+      - gum format "* Created at - {{.REPO_CREATED_AT}}" "* Languages - {{.PROJECT_LANGUAGE}}"
+      - gum format "### Pending tasks" "{{.PROJECT_ISSUES}}"
 
-  generate:
-    desc: Generate the gh-pm binary
-    aliases: [g]
+  _project_name:
+    ignore_error: true
+    vars:
+      OWNER:
+        sh: git remote -v | grep -m 1 origin | awk -F'[:/]' '{print $5}'
+      REPO:
+        sh: basename $(git rev-parse --show-toplevel)
     cmds:
-      - defer: rm -rf types
-      - task: mock:fetch-data
-      - task: mock:jsonpkl-cards.json
-      - task: mock:jsonpkl-issues.json
-      - task: mock:jsonpkl-milestones.json
-      - task: mock:jsonpkl-prs.json
-      - task: mock:jsonpkl-projects.json
-      - task: mock:jsonpkl-releases.json
-      - task: mock:jsonpkl-user.json
+      - echo {{.OWNER}}/{{.REPO}}
 
-  test:
-    desc: Run the tests
-    aliases: [t]
+  _repo_created_at:
+    ignore_error: true
     cmds:
-      - go test -v ./...
-    silent: true
+      - gh repo view --json pushedAt --jq .pushedAt
+
+  _repo_description:
+    ignore_error: true
+    cmds:
+      - gh repo view --json description --jq .description
+
+  _repo_issues:
+    ignore_error: true
+    cmds:
+      - gh recent-issues
+
+  _repo_labels:
+    ignore_error: true
+    cmds:
+      - gh repo view --json labels --jq .labels
+
+  _repo_languages:
+    ignore_error: true
+    cmds:
+      - gh repo view --json languages --jq .languages
+
+  _repo_latest_release:
+    ignore_error: true
+    cmds:
+      - gh repo view --json latestRelease --jq .latestRelease
+
+  _repo_pushed_at:
+    ignore_error: true
+    cmds:
+      - gh repo view --json pushedAt --jq .pushedAt
+
+  _repo_stargazer_count:
+    ignore_error: true
+    cmds:
+      - gh repo view --json stargazerCount --jq .stargazerCount
