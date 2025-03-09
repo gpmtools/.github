@@ -4,18 +4,17 @@ silent: true
 vars:
   ORG: gpmtools
 includes:
-  build: { taskfile: ./taskfiles/Build.yml, dir: "{{.USER_WORKING_DIR}}" }
-  generate: { taskfile: ./taskfiles/Generate.yml, dir: "{{.USER_WORKING_DIR}}" }
-  install: { taskfile: ./taskfiles/Install.yml, dir: "{{.USER_WORKING_DIR}}" }
-  lint: { taskfile: ./taskfiles/Lint.yml, dir: "{{.USER_WORKING_DIR}}" }
-  release: { taskfile: ./taskfiles/Release.yml, dir: "{{.USER_WORKING_DIR}}" }
-  test: { taskfile: ./taskfiles/Test.yml, dir: "{{.USER_WORKING_DIR}}" }
+  build: { taskfile: ./taskfiles/Build.yml }
+  generate: { taskfile: ./taskfiles/Generate.yml }
+  install: { taskfile: ./taskfiles/Install.yml }
+  lint: { taskfile: ./taskfiles/Lint.yml }
+  test: { taskfile: ./taskfiles/Test.yml }
 
 tasks:
   default:
     ignore_error: true
     cmds:
-      - task -l
+      - task --list-all
 
   stat:
     desc: Display information about the project
