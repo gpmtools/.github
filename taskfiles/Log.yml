@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+tasks:
+  i-*:
+    vars:
+      TEXT: "{{index .MATCH 0}}"
+    cmds:
+      - gum log -l info {{.TEXT}}
+
+  w-*:
+    vars:
+      TEXT: "{{index .MATCH 0}}"
+    cmds:
+      - gum log -l warn {{.TEXT}}
+
+  e-*:
+    vars:
+      TEXT: "{{index .MATCH 0}}"
+    cmds:
+      - gum log -l error {{.TEXT}}
+
+  d-*:
+    vars:
+      TEXT: "{{index .MATCH 0}}"
+    cmds:
+      - gum log -l debug {{.TEXT}}

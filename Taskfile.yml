@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+includes:
+  log: taskfiles/Log.yml
+  mock: taskfiles/Mock.yml
+  pkgs: taskfiles/Pkgs.yml
+
+vars:
+  ROOT_DIR:
+    sh: git rev-parse --show-toplevel
+
+tasks:
+  build:
+    desc: Build the gh-pm binary
+    aliases: [b]
+    cmds:
+      - go build -o gh-pm main.go
+      - task: log:i-"Build completed"
+      - gh extension remove gh-pm
+      - task: log:w-"Removing previous version"
+      - gh extension install . --force
+      - task: log:i-"Install completed"
+    silent: true
+
+  generate:
+    desc: Generate the gh-pm binary
+    aliases: [g]
+    cmds:
+      - defer: rm -rf types
+      - task: mock:fetch-data
+      - task: mock:jsonpkl-cards.json
+      - task: mock:jsonpkl-issues.json
+      - task: mock:jsonpkl-milestones.json
+      - task: mock:jsonpkl-prs.json
+      - task: mock:jsonpkl-projects.json
+      - task: mock:jsonpkl-releases.json
+      - task: mock:jsonpkl-user.json
+
+  test:
+    desc: Run the tests
+    aliases: [t]
+    cmds:
+      - go test -v ./...
+    silent: true
