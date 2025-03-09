@@ -1,6 +1,10 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 silent: true
+vars:
+  ORG: gpmtools
+  SRC:
+    sh: echo $XDG_CONFIG_HOME/gpm/orgs/{{.ORG}}
 includes:
   build: ./taskfiles/Build.yml
   generate: ./taskfiles/Generate.yml
