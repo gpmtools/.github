@@ -1,6 +1,10 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
 version: "3"
 silent: true
+
 tasks:
   release:
     cmd: task -l --json | jq -r '.tasks[].name' | fzf | xargs task
+
+  bump:
+    desc: Bump the version

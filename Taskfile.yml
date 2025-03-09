@@ -2,12 +2,12 @@
 version: "3"
 silent: true
 includes:
-  build: { taskfile: taskfiles/Build.yml, flatten: true }
-  generate: { taskfile: taskfiles/Generate.yml, flatten: true }
-  install: { taskfile: taskfiles/Install.yml, flatten: true }
-  lint: { taskfile: taskfiles/Lint.yml, flatten: true }
-  release: { taskfile: taskfiles/Release.yml, flatten: true }
-  test: { taskfile: taskfiles/Test.yml, flatten: true }
+  build: ./taskfiles/Build.yml
+  generate: ./taskfiles/Generate.yml
+  install: ./taskfiles/Install.yml
+  lint: ./taskfiles/Lint.yml
+  release: ./taskfiles/Release.yml
+  test: ./taskfiles/Test.yml
 
 tasks:
   default:
